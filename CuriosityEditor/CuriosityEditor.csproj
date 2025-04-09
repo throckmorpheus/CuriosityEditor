@@ -24,6 +24,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NHEditor.csproj.user" />
+    <Content Include="CuriosityEditor.csproj.user" />
   </ItemGroup>
 </Project>

@@ -1,12 +1,10 @@
 using HarmonyLib;
 
-namespace FreeCam.Patches;
+namespace CuriosityEditor.Patches;
 
 [HarmonyPatch(typeof(MapController))]
 internal static class MapControllerPatches
 {
-    // Fixes bug where using the freecam in map mode keeps you stuck in the None input mode
-
     private static InputMode _oldInputMode;
 
     [HarmonyPrefix]

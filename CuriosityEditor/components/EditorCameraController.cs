@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace NHEditor.Components;
+namespace CuriosityEditor.Components;
 
 public class EditorCameraController : MonoBehaviour
 {

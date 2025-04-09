@@ -1,5 +1,5 @@
 
-namespace NHEditor;
+namespace CuriosityEditor;
 
 public static class VectorConversionExtensions
 {

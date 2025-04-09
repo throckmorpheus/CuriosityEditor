@@ -2,7 +2,7 @@
 using HarmonyLib;
 using ImGuiNET;
 using ImGuiOW.API;
-using NHEditor.Components;
+using CuriosityEditor.Components;
 using OWML.Common;
 using OWML.ModHelper;
 using System;
@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.PostProcessing;
 using UnityEngine.SceneManagement;
 
-namespace NHEditor;
+namespace CuriosityEditor;
 
 public class Main : ModBehaviour
 {
