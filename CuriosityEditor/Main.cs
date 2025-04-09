@@ -38,6 +38,7 @@ public class Main : ModBehaviour
 
 	private bool _inEditorCamera = false;
 	private InputMode _returnInputMode;
+	private CursorLockMode _returnCursorLockMode;
 
 	public void Awake() => Instance = this;
 
@@ -48,6 +49,8 @@ public class Main : ModBehaviour
 		CommonCameraAPI = ModHelper.Interaction.TryGetModApi<ICommonCameraAPI>("xen.CommonCameraUtility");
 		ImGuiAPI = ModHelper.Interaction.TryGetModApi<IImGuiAPI>("Throckmorpheus.ImGuiOW");
 		GizmosAPI = ModHelper.Interaction.TryGetModApi<IGizmosAPI>("Locochoco.GizmosLibrary");
+
+		gameObject.AddComponent<InputManager>();
 
 		CreateCamera();
 		SceneManager.sceneLoaded += OnSceneLoaded;
@@ -88,15 +91,16 @@ public class Main : ModBehaviour
 
 	private void OnEnterEditor() {
 		if (!Instance._inEditorCamera) CommonCameraAPI.EnterCamera(EditorCamera);
-		_returnInputMode = OWInput.GetInputMode();
-		OWInput.ChangeInputMode(InputMode.None);
+		_returnInputMode = OWInput.GetInputMode(); OWInput.ChangeInputMode(InputMode.None);
+		_returnCursorLockMode = Cursor.lockState; Cursor.lockState = CursorLockMode.None;
 	}
 	private void OnExitEditor() {
 		if (Instance._inEditorCamera) CommonCameraAPI.ExitCamera(EditorCamera);
 		OWInput.ChangeInputMode(_returnInputMode == InputMode.None ? InputMode.Character : _returnInputMode);
+		Cursor.lockState = _returnCursorLockMode;
 	}
 
-	public void OnRenderObject() {
+	/*public void OnRenderObject() {
 		GizmosAPI.SetDefaultMaterialPass();
         GizmosAPI.DrawOnGlobalReference(() =>
         {
@@ -119,5 +123,5 @@ public class Main : ModBehaviour
             GizmosAPI.DrawAxis(0.25f, Color.green, Vector3.zero);
             //The head size scales with the transform scale, so 0.25f is more a 25%
         });
-    }
+    }*/
 }

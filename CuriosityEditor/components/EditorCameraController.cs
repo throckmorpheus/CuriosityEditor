@@ -7,13 +7,21 @@ namespace CuriosityEditor.Components;
 
 public class EditorCameraController : MonoBehaviour
 {
-    public readonly Key[] ToggleKeys = [ Key.Semicolon, Key.NumpadPeriod ];
-    private bool AnyPressedThisFrame(IEnumerable<Key> keys) => keys.Any(key => Keyboard.current[key].wasPressedThisFrame);
-
     //public void Start() => ParentToPlayer(true);
 
     public void Update() {
-        if (AnyPressedThisFrame(ToggleKeys)) Main.InEditor = !Main.InEditor;
+        if (InputManager.Inputs.ToggleEditor.JustPressed) Main.InEditor = !Main.InEditor;
+
+        if (!Main.InEditor) return;
+
+        var lookRate = OWInput.UsingGamepad() ? PlayerCameraController.GAMEPAD_LOOK_RATE_Y : PlayerCameraController.LOOK_RATE;
+
+        //var lookDelta = OWInput.GetAxisValue(InputLibrary.look, InputMode.All) * lookRate * Time.unscaledDeltaTime;
+        var lookDelta = InputManager.Inputs.Turn.Value * lookRate * Time.unscaledDeltaTime;
+
+        if (OWInput.IsPressed(InputLibrary.rollMode)) transform.Rotate(Vector3.forward, -lookDelta.x);
+        else transform.Rotate(Vector3.up, lookDelta.x);
+        transform.Rotate(Vector3.right, -lookDelta.y);
     }
 
     public void ParentToPlayer(bool warp = false) {
