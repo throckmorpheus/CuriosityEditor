@@ -6,5 +6,5 @@
   "uniqueName": "Throckmorpheus.NHEditor",
   "version": "0.1.0",
   "owmlVersion": "2.13.0",
-  "dependencies": [ "Throckmorpheus.ImGuiOW" ]
+  "dependencies": [ "Throckmorpheus.ImGuiOW", "xen.CommonCameraUtility", "Locochoco.GizmosLibrary" ]
 }
