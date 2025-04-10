@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
 
 namespace CuriosityEditor;
+
+public enum MouseAxis {
+    Wheel,
+    Horizontal,
+    Vertical,
+    Both
+}
 
 [Serializable]
 public class InputBinding {
@@ -13,8 +21,8 @@ public class InputBinding {
     public readonly List<MouseButton> MouseButtons = [];
     public readonly List<GamepadButton> GamepadButtons = [];
 
-    public readonly List<SingleAxis> SingleAxes = [];
-    public readonly List<DoubleAxis> DoubleAxes = [];
+    public readonly List<MouseAxis> SingleAxes = [];
+    public readonly List<MouseAxis> DoubleAxes = [];
 
     public void CopyFrom(InputBinding binding) {
         Keys.Clear(); Keys.AddRange(binding.Keys);
@@ -29,4 +37,17 @@ public class InputBinding {
             MouseButton.Middle => Mouse.current.middleButton,
             MouseButton.Forward => Mouse.current.forwardButton, MouseButton.Back => Mouse.current.backButton
         }));
+    
+    public float SingleAxisValue => SingleAxes.Select(axis => axis switch {
+        MouseAxis.Horizontal => Mouse.current.delta.right.ReadValue(),
+        MouseAxis.Vertical => Mouse.current.delta.up.ReadValue(),
+        _ => 0f
+    }).OrderBy(x => x).FirstOrDefault();
+
+    public Vector2 DoubleAxisValue => DoubleAxes.Select(axis => axis switch {
+        MouseAxis.Both => Mouse.current.delta.ReadValue(),
+        MouseAxis.Horizontal => new(Mouse.current.delta.right.ReadValue(), 0f),
+        MouseAxis.Vertical => new(0f, Mouse.current.delta.up.ReadValue()),
+        _ => new()
+    }).OrderBy(x => x.magnitude).FirstOrDefault();
 }

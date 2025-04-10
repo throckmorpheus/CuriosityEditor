@@ -31,7 +31,6 @@ public class InputManager : MonoBehaviour
             logicalInput._binding = binding;
             member.SetValue(null, logicalInput);
             _bindings.Add(logicalInput, binding);
-            Main.Console.Info($"Created input '{member.Name}'.");
         }
 
         if (!LoadInputConfig()) SetupDefaultInputConfig();
@@ -42,9 +41,9 @@ public class InputManager : MonoBehaviour
     public void SetupDefaultInputConfig() {
         _bindings[Inputs.ToggleEditor].Keys.Add(Key.Semicolon);
         _bindings[Inputs.PivotCamera].MouseButtons.Add(MouseButton.Middle);
-        _bindings[Inputs.Pan].DoubleAxes.Add(MouseAxis.mouse);
-        _bindings[Inputs.Turn].DoubleAxes.Add(MouseAxis.mouse);
-        _bindings[Inputs.Zoom].SingleAxes.Add(MouseAxis.mouseWheel);
+        _bindings[Inputs.Pan].DoubleAxes.Add(MouseAxis.Both);
+        _bindings[Inputs.Turn].DoubleAxes.Add(MouseAxis.Both);
+        _bindings[Inputs.Zoom].SingleAxes.Add(MouseAxis.Wheel);
         Main.Console.Info("Loaded default input config.");
     }
 

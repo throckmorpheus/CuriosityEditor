@@ -39,6 +39,7 @@ public class Main : ModBehaviour
 	private bool _inEditorCamera = false;
 	private InputMode _returnInputMode;
 	private CursorLockMode _returnCursorLockMode;
+	private bool _returnCursorVisibility;
 
 	public void Awake() => Instance = this;
 
@@ -92,12 +93,14 @@ public class Main : ModBehaviour
 	private void OnEnterEditor() {
 		if (!Instance._inEditorCamera) CommonCameraAPI.EnterCamera(EditorCamera);
 		_returnInputMode = OWInput.GetInputMode(); OWInput.ChangeInputMode(InputMode.None);
-		_returnCursorLockMode = Cursor.lockState; Cursor.lockState = CursorLockMode.None;
+		_returnCursorLockMode = Cursor.lockState; Cursor.lockState = CursorLockMode.Confined;
+		_returnCursorVisibility = Cursor.visible; Cursor.visible = true;
 	}
 	private void OnExitEditor() {
 		if (Instance._inEditorCamera) CommonCameraAPI.ExitCamera(EditorCamera);
 		OWInput.ChangeInputMode(_returnInputMode == InputMode.None ? InputMode.Character : _returnInputMode);
 		Cursor.lockState = _returnCursorLockMode;
+		Cursor.visible = _returnCursorVisibility;
 	}
 
 	/*public void OnRenderObject() {

@@ -1,7 +1,5 @@
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.LowLevel;
 
 namespace CuriosityEditor;
 
@@ -17,9 +15,9 @@ public class LogicalBooleanInput : LogicalInput {
 
 public class LogicalAxisInput : LogicalInput {
     public bool Down => _binding.ButtonControls.Any(x => x.isPressed);
-    public float Value => _binding.ButtonControls.Select(x => x.pressPoint).Concat(_binding.SingleAxes.Select(x => x.GetValue())).OrderBy(x => x).FirstOrDefault();
+    public float Value => _binding.ButtonControls.Select(x => x.pressPoint).Append(_binding.SingleAxisValue).OrderBy(x => x).FirstOrDefault();
 }
 
 public class Logical2DInput : LogicalInput {
-    public Vector2 Value => _binding.DoubleAxes.First().GetValue();
+    public Vector2 Value => _binding.DoubleAxisValue;
 }

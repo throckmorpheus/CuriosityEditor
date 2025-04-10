@@ -1,5 +1,5 @@
 ﻿<Project>
   <PropertyGroup>
-    <OutputPath>$(AppData)/OuterWildsModManager/OWML/Mods/Throckmorpheus.NHEditor</OutputPath>
+    <OutputPath>$(AppData)/OuterWildsModManager/OWML/Mods/Throckmorpheus.CuriosityEditor</OutputPath>
   </PropertyGroup>
 </Project>
