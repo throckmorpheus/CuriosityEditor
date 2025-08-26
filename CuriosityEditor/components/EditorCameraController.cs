@@ -10,14 +10,12 @@ public class EditorCameraController : MonoBehaviour
     //public void Start() => ParentToPlayer(true);
 
     public void Update() {
-        if (InputManager.Inputs.ToggleEditor.JustPressed) Main.InEditor = !Main.InEditor;
-
-        if (!Main.InEditor) return;
-
-        var lookRate = OWInput.UsingGamepad() ? PlayerCameraController.GAMEPAD_LOOK_RATE_Y : PlayerCameraController.LOOK_RATE;
-
-        //var lookDelta = OWInput.GetAxisValue(InputLibrary.look, InputMode.All) * lookRate * Time.unscaledDeltaTime;
+        var lookRate = 10f;
         var lookDelta = InputManager.Inputs.Turn.Value * lookRate * Time.unscaledDeltaTime;
+
+        if (InputManager.Inputs.PivotCamera.Down) {
+
+        }
 
         if (OWInput.IsPressed(InputLibrary.rollMode)) transform.Rotate(Vector3.forward, -lookDelta.x);
         else transform.Rotate(Vector3.up, lookDelta.x);

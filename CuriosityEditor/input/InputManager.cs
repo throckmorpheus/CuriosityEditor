@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -18,7 +17,7 @@ public class InputManager : MonoBehaviour
         public static Logical2DInput Turn;
     }
 
-    private InputManager Instance;
+    private static InputManager Instance;
 
     public void Start() {
         if (Instance is not null) throw new Exception("Attempted to initialise more than one InputManager");

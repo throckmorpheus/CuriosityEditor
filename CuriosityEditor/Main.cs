@@ -22,25 +22,6 @@ public class Main : ModBehaviour
 	public static IImGuiAPI ImGuiAPI { get; private set; }
 	public static IGizmosAPI GizmosAPI { get; private set; }
 
-	private bool _inEditorMode = false;
-	public static bool InEditor {
-		get => Instance._inEditorMode;
-		set {
-			if (value != Instance._inEditorMode) { if (value) EnterEditor?.Invoke(); else ExitEditor?.Invoke(); }
-			Instance._inEditorMode = value;
-		}
-	}
-
-	public static event Action EnterEditor;
-	public static event Action ExitEditor;
-
-	public static OWCamera EditorCamera { get; private set; }
-
-	private bool _inEditorCamera = false;
-	private InputMode _returnInputMode;
-	private CursorLockMode _returnCursorLockMode;
-	private bool _returnCursorVisibility;
-
 	public void Awake() => Instance = this;
 
 	public void Start() {
@@ -52,55 +33,7 @@ public class Main : ModBehaviour
 		GizmosAPI = ModHelper.Interaction.TryGetModApi<IGizmosAPI>("Locochoco.GizmosLibrary");
 
 		gameObject.AddComponent<InputManager>();
-
-		CreateCamera();
-		SceneManager.sceneLoaded += OnSceneLoaded;
-
-		GlobalMessenger<OWCamera>.AddListener("SwitchActiveCamera", OnSwitchActiveCamera);
-
-		EnterEditor += OnEnterEditor;
-		ExitEditor += OnExitEditor;
-	}
-
-	public void OnDestroy() {
-		GlobalMessenger<OWCamera>.RemoveListener("SwitchActiveCamera", OnSwitchActiveCamera);
-		SceneManager.sceneLoaded -= OnSceneLoaded;
-		EnterEditor -= OnEnterEditor;
-		ExitEditor -= OnExitEditor;
-	}
-
-	private void CreateCamera() {
-		_inEditorCamera = false;
-
-		(EditorCamera, _) = CommonCameraAPI.CreateCustomCamera("NHEditorCamera", (owCamera) => {
-			if (owCamera?._postProcessing?.profile?.eyeMask is EyeMaskModel eyeMask) eyeMask.enabled = false;
-			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("UI"));
-			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("HeadsUpDisplay"));
-			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("HelmetUVPass"));
-		});
-
-		EditorCamera.gameObject.AddComponent<EditorCameraController>();
-
-		EditorCamera.gameObject.SetActive(true);
-	}
-	private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => CreateCamera();
-
-	private void OnSwitchActiveCamera(OWCamera camera) {
-		_inEditorCamera = camera == EditorCamera;
-		// Possibly disable editor mode and set to return to editor mode on return to editor camera?
-	}
-
-	private void OnEnterEditor() {
-		if (!Instance._inEditorCamera) CommonCameraAPI.EnterCamera(EditorCamera);
-		_returnInputMode = OWInput.GetInputMode(); OWInput.ChangeInputMode(InputMode.None);
-		_returnCursorLockMode = Cursor.lockState; Cursor.lockState = CursorLockMode.Confined;
-		_returnCursorVisibility = Cursor.visible; Cursor.visible = true;
-	}
-	private void OnExitEditor() {
-		if (Instance._inEditorCamera) CommonCameraAPI.ExitCamera(EditorCamera);
-		OWInput.ChangeInputMode(_returnInputMode == InputMode.None ? InputMode.Character : _returnInputMode);
-		Cursor.lockState = _returnCursorLockMode;
-		Cursor.visible = _returnCursorVisibility;
+		gameObject.AddComponent<EditorManager>();
 	}
 
 	/*public void OnRenderObject() {
