@@ -40,8 +40,8 @@ public class InputManager : MonoBehaviour
         
         // Camera controls
         _bindings[Inputs.Zoom].Add(SingleAxis.WheelVertical);
-        _bindings[Inputs.Pivot].With(DoubleAxis.Mouse).When(MouseButton.Middle);
-        _bindings[Inputs.Pan].With(DoubleAxis.Mouse).When(MouseButton.Right);
+        _bindings[Inputs.Pivot].With(DoubleAxis.Mouse).When(MouseButton.Middle).WhenNot(Key.LeftShift, Key.RightShift);
+        _bindings[Inputs.Pan].With(DoubleAxis.Mouse).When(MouseButton.Middle).When(Key.LeftShift, Key.RightShift);
         Console.Info("Loaded default input config.");
     }
 

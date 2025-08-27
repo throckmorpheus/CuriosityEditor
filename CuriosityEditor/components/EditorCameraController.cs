@@ -44,6 +44,7 @@ public class EditorCameraController : MonoBehaviour
         }
 
         if (Inputs.Pan.Down) {
+            // TK - Should possibly change the pan rate along with the zoom?
             var panDelta = Inputs.Pan.Value * panRate * deltaTime;
 
             var localPan = new Vector3(panDelta.x, panDelta.y, 0f);

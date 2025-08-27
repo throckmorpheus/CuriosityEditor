@@ -18,6 +18,7 @@ public class InstantDebugWindow : Window {
     }
 
     private void OnInstantDebugMessage(string key, string message) {
+        if (!Visible || !EditorManager.InEditor) return;
         if (!messages.ContainsKey(key)) messages.Add(key, []);
         messages[key].Add(message);
     }

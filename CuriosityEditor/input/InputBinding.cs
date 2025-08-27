@@ -30,33 +30,40 @@ public class InputBinding {
     public readonly List<DoubleAxis> DoubleAxes = [];
 
     public readonly List<InputBinding> Required = [];
+    public readonly List<InputBinding> Disqualifying = [];
 
-    public void Add(params Key[] keys)              { Keys.AddRange(keys); }
-    public void Add(params MouseButton[] buttons)   { MouseButtons.AddRange(buttons); }
-    public void Add(params GamepadButton[] buttons) { GamepadButtons.AddRange(buttons); }
-    public void Add(params SingleAxis[] axes)       { SingleAxes.AddRange(axes); }
-    public void Add(params DoubleAxis[] axes)       { DoubleAxes.AddRange(axes); }
+    public void Add(params Key[] keys)                          { Keys.AddRange(keys); }
+    public void Add(params MouseButton[] buttons)               { MouseButtons.AddRange(buttons); }
+    public void Add(params GamepadButton[] buttons)             { GamepadButtons.AddRange(buttons); }
+    public void Add(params SingleAxis[] axes)                   { SingleAxes.AddRange(axes); }
+    public void Add(params DoubleAxis[] axes)                   { DoubleAxes.AddRange(axes); }
 
-    public InputBinding With(params Key[] keys)              { Add(keys); return this; }
-    public InputBinding With(params MouseButton[] buttons)   { Add(buttons); return this; }
-    public InputBinding With(params GamepadButton[] buttons) { Add(buttons); return this; }
-    public InputBinding With(params SingleAxis[] axes)       { Add(axes); return this; }
-    public InputBinding With(params DoubleAxis[] axes)       { Add(axes); return this; }
+    public InputBinding With(params Key[] keys)                 { Add(keys); return this; }
+    public InputBinding With(params MouseButton[] buttons)      { Add(buttons); return this; }
+    public InputBinding With(params GamepadButton[] buttons)    { Add(buttons); return this; }
+    public InputBinding With(params SingleAxis[] axes)          { Add(axes); return this; }
+    public InputBinding With(params DoubleAxis[] axes)          { Add(axes); return this; }
 
-    public InputBinding When(InputBinding required)          { Required.Add(required); return this; }
-    public InputBinding When(params Key[] keys)              { When(new InputBinding().With(keys)); return this; }
-    public InputBinding When(params MouseButton[] buttons)   { When(new InputBinding().With(buttons)); return this; }
-    public InputBinding When(params GamepadButton[] buttons) { When(new InputBinding().With(buttons)); return this; }
-    public InputBinding When(params SingleAxis[] axes)       { When(new InputBinding().With(axes)); return this; }
-    public InputBinding When(params DoubleAxis[] axes)       { When(new InputBinding().With(axes)); return this; }
-
+    public InputBinding When(InputBinding required)             { Required.Add(required); return this; }
+    public InputBinding When(params Key[] keys)                 { When(new InputBinding().With(keys)); return this; }
+    public InputBinding When(params MouseButton[] buttons)      { When(new InputBinding().With(buttons)); return this; }
+    public InputBinding When(params GamepadButton[] buttons)    { When(new InputBinding().With(buttons)); return this; }
+    public InputBinding When(params SingleAxis[] axes)          { When(new InputBinding().With(axes)); return this; }
+    public InputBinding When(params DoubleAxis[] axes)          { When(new InputBinding().With(axes)); return this; }
+    
+    public InputBinding WhenNot(InputBinding disqualifying)     { Disqualifying.Add(disqualifying); return this; }
+    public InputBinding WhenNot(params Key[] keys)              { WhenNot(new InputBinding().With(keys)); return this; }
+    public InputBinding WhenNot(params MouseButton[] buttons)   { WhenNot(new InputBinding().With(buttons)); return this; }
+    public InputBinding WhenNot(params GamepadButton[] buttons) { WhenNot(new InputBinding().With(buttons)); return this; }
+    public InputBinding WhenNot(params SingleAxis[] axes)       { WhenNot(new InputBinding().With(axes)); return this; }
+    public InputBinding WhenNot(params DoubleAxis[] axes)       { WhenNot(new InputBinding().With(axes)); return this; }
 
     public void CopyFrom(InputBinding binding) {
         Keys.Clear(); Keys.AddRange(binding.Keys);
         MouseButtons.Clear(); MouseButtons.AddRange(binding.MouseButtons);
     }
 
-    public bool RequirementsMet => Required.Count == 0 || Required.All(x => x.BooleanValue);
+    public bool RequirementsMet => Required.Count == 0 || Required.All(x => x.BooleanValue) && !Disqualifying.Any(x => x.BooleanValue);
 
     public IEnumerable<ButtonControl> ButtonControls =>
         Keys.Select(key => Keyboard.current[key])
