@@ -17,6 +17,7 @@ public class Console {
     }
 
     public static event Action<string, MessageType, Type> OnMessage;
+    public static event Action<string, string> OnInstantDebugMessage;
     
     public static void Info(string message)                 => Message(message, MessageType.Info);
     public static void Info<T>(string message)              => Message(message, MessageType.Info, typeof(T));
@@ -41,6 +42,12 @@ public class Console {
     public static void Fatal(string message)                => Message(message, MessageType.Fatal);
     public static void Fatal<T>(string message)             => Message(message, MessageType.Fatal, typeof(T));
     public static void Fatal<T>(T _from, string message)    => Message(message, MessageType.Fatal, typeof(T));
+
+    public static class Instant {
+        public static void Debug(string message) => InstantMessage(message, "");
+        public static void Debug<T>(string message) => InstantMessage(message, typeof(T));
+        public static void Debug(object key, string message) => InstantMessage(message, key);
+    }
     
     private static void Message(string message, MessageType messageType, Type senderType = null) {
         // Send message to OWML console
@@ -49,5 +56,16 @@ public class Console {
 
         // Trigger event (for ImGui console to hook on to)
         OnMessage?.Invoke(message, messageType, senderType);
+    }
+
+    private static void InstantMessage(string message, object keyObj) {
+        string key = keyObj switch {
+            string keyStr => keyStr,
+            Type keyType => keyType.Name,
+            _ => keyObj.GetType().Name
+        };
+
+        // Trigger event
+        OnInstantDebugMessage?.Invoke(key, message);
     }
 }

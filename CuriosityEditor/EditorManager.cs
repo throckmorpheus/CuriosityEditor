@@ -25,6 +25,7 @@ public class EditorManager : MonoBehaviour {
     
     // Editor camera
 	public static OWCamera EditorCamera { get; private set; }
+    public static EditorCameraController CameraController { get; private set; }
 	private bool _inEditorCamera = false;
 	private InputMode _returnInputMode;
     
@@ -32,7 +33,7 @@ public class EditorManager : MonoBehaviour {
 
     // Interface components
     private readonly ConsoleWindow consoleWindow = new();
-    private readonly RandomDebugWindow randomDebugWindow = new();
+    private readonly InstantDebugWindow instantDebugWindow = new();
     
     public void Start() {
         if (Instance is not null) throw new Exception($"Attempted to initialise more than one {GetType().Name}");
@@ -61,7 +62,7 @@ public class EditorManager : MonoBehaviour {
 	}
 
     public void Update() {
-        if (InputManager.Inputs.ToggleEditor.JustPressed && !IsInPauseMenu()) InEditor = !InEditor;
+        if (Inputs.ToggleEditor.JustPressed && !IsInPauseMenu()) InEditor = !InEditor;
     }
 
     private bool IsInPauseMenu() => _pauseMenuManager?.IsOpen() ?? false;
@@ -82,7 +83,7 @@ public class EditorManager : MonoBehaviour {
 			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("HelmetUVPass"));
 		});
         
-		EditorCamera.gameObject.AddComponent<EditorCameraController>();
+		CameraController = EditorCamera.gameObject.AddComponent<EditorCameraController>();
 		EditorCamera.gameObject.SetActive(true);
         EditorCamera.enabled = false;
         _inEditorCamera = false;
@@ -112,6 +113,17 @@ public class EditorManager : MonoBehaviour {
 		EditorCamera.enabled = false;
     }
 
+    public void OnRenderObject() {
+        if (!InEditor) return;
+
+        Main.GizmosAPI.SetDefaultMaterialPass();
+
+        // Draw camera focus
+        if (EditorCamera is not null) Main.GizmosAPI.DrawWithReference(CameraController.Target, () => {
+            Main.GizmosAPI.DrawAxis(0.25f, Color.green, Vector3.zero);
+        });
+    }
+
     private void Layout() {
         if (!InEditor) return;
         ImGui.DockSpaceOverViewport(ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
@@ -131,13 +143,12 @@ public class EditorManager : MonoBehaviour {
             }
             if (ImGui.BeginMenu("Windows")) {
                 consoleWindow.ToggleMenuItem();
-                randomDebugWindow.ToggleMenuItem();
                 ImGui.EndMenu();
             }
             ImGui.EndMainMenuBar();
         }
 
+        instantDebugWindow.Draw();
         consoleWindow.Draw();
-        randomDebugWindow.Draw();
     }
 }

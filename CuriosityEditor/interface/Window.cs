@@ -6,7 +6,7 @@ namespace CuriosityEditor.Interface;
 
 public abstract class Window
 {
-    private bool _visible = false;
+    private bool _visible = true;
     public bool Visible { get => _visible; set => _visible = value; }
 
     private string _name = null;
@@ -35,6 +35,6 @@ public abstract class Window
     }
 
     public void ToggleMenuItem() {
-        if (ImGui.MenuItem(Name, Visible)) { Visible = !Visible; }
+        if (ImGui.MenuItem(Name)) { Visible = !Visible; }
     }
 }

@@ -7,16 +7,15 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace CuriosityEditor;
 
+public class Inputs {
+    public static LogicalBooleanInput ToggleEditor;
+    public static LogicalAxisInput Zoom;
+    public static Logical2DInput Pan;
+    public static Logical2DInput Pivot;
+}
+
 public class InputManager : MonoBehaviour
 {
-    public class Inputs {
-        public static LogicalBooleanInput ToggleEditor;
-        public static LogicalBooleanInput PivotCamera;
-        public static LogicalAxisInput Zoom;
-        public static Logical2DInput Pan;
-        public static Logical2DInput Turn;
-    }
-
     private static InputManager Instance;
 
     public void Start() {
@@ -37,11 +36,12 @@ public class InputManager : MonoBehaviour
     private readonly Dictionary<LogicalInput, InputBinding> _bindings = [];
 
     public void SetupDefaultInputConfig() {
-        _bindings[Inputs.ToggleEditor].Keys.Add(Key.Semicolon);
-        _bindings[Inputs.PivotCamera].MouseButtons.Add(MouseButton.Middle);
-        _bindings[Inputs.Pan].DoubleAxes.Add(MouseAxis.Both);
-        _bindings[Inputs.Turn].DoubleAxes.Add(MouseAxis.Both);
-        _bindings[Inputs.Zoom].SingleAxes.Add(MouseAxis.Wheel);
+        _bindings[Inputs.ToggleEditor].Add(Key.Semicolon);
+        
+        // Camera controls
+        _bindings[Inputs.Zoom].Add(SingleAxis.WheelVertical);
+        _bindings[Inputs.Pivot].With(DoubleAxis.Mouse).When(MouseButton.Middle);
+        _bindings[Inputs.Pan].With(DoubleAxis.Mouse).When(MouseButton.Right);
         Console.Info("Loaded default input config.");
     }
 
