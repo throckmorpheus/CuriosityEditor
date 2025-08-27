@@ -34,29 +34,4 @@ public class Main : ModBehaviour
 		gameObject.AddComponent<InputManager>();
 		gameObject.AddComponent<EditorManager>();
 	}
-
-	/*public void OnRenderObject() {
-		GizmosAPI.SetDefaultMaterialPass();
-        GizmosAPI.DrawOnGlobalReference(() =>
-        {
-            //You can call DrawAxis outside of DrawOnGlobalReference, but it is recommended to do it inside one
-            //if you want the global reference frame, as this pushes and pops the identity transform matrix for you
-            GizmosAPI.DrawAxis(0.25f, Color.green, Vector3.zero);
-        });
-        GizmosAPI.DrawAxis(0.25f, Color.red, Vector3.zero);
-
-        if (Locator.GetPlayerTransform() == null)
-            return;
-
-        //Draw Player Transform Example
-        GizmosAPI.DrawWithReference(Locator.GetPlayerTransform(), () =>
-        {
-            //If inside DrawWithReference it will draw as if it was a child of the transform,
-            //so its position, rotation and scale will affect the final draw.
-            //This is the recommended way to draw relative stuff like axis
-
-            GizmosAPI.DrawAxis(0.25f, Color.green, Vector3.zero);
-            //The head size scales with the transform scale, so 0.25f is more a 25%
-        });
-    }*/
 }

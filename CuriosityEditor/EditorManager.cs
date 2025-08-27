@@ -63,6 +63,7 @@ public class EditorManager : MonoBehaviour {
 
     public void Update() {
         if (Inputs.ToggleEditor.JustPressed && !IsInPauseMenu()) InEditor = !InEditor;
+        Console.Instant.Debug($"FPS: {1f/Time.unscaledDeltaTime}");
     }
 
     private bool IsInPauseMenu() => _pauseMenuManager?.IsOpen() ?? false;
@@ -119,9 +120,21 @@ public class EditorManager : MonoBehaviour {
         Main.GizmosAPI.SetDefaultMaterialPass();
 
         // Draw camera focus
-        if (EditorCamera is not null) Main.GizmosAPI.DrawWithReference(CameraController.Target, () => {
-            Main.GizmosAPI.DrawAxis(0.25f, Color.green, Vector3.zero);
-        });
+        if (EditorCamera is not null) {
+            Main.GizmosAPI.DrawWithReference(CameraController.Target, () => {
+                Main.GizmosAPI.DrawVector(new Vector3(1f, 0f, 0f), 0f, Vector3.zero, Color.red);
+                Main.GizmosAPI.DrawVector(new Vector3(0f, 1f, 0f), 0f, Vector3.zero, Color.green);
+                Main.GizmosAPI.DrawVector(new Vector3(0f, 0f, 1f), 0f, Vector3.zero, Color.blue);
+            });
+            Main.GizmosAPI.DrawOnGlobalReference(() => {
+                Main.GizmosAPI.DrawWireframeSphere(0.1f,
+                    CameraController.Target.position + CameraController.Offset,
+                    CameraController.Target.forward, CameraController.Target.up,
+                    Color.white, 10
+                );
+            });
+        }
+
     }
 
     private void Layout() {

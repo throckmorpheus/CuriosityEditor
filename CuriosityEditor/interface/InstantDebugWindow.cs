@@ -29,12 +29,14 @@ public class InstantDebugWindow : Window {
     }
     public override void Content() {
         foreach (var (key, lines) in messages) {
-            ImGui.SeparatorText($"{key}  ");
-            ImGui.SameLine(); ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.CalcTextSize("   ").X);
             bool enabled = !disabledKeys.Contains(key);
-            ImGui.PushID($"{key}_toggle");
-            if (ImGui.Checkbox("", ref enabled)) { if (enabled) disabledKeys.Remove(key); else disabledKeys.Add(key); }
-            ImGui.PopID();
+            if (key != "") {
+                ImGui.SeparatorText($"{key}  ");
+                ImGui.SameLine(); ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.CalcTextSize("   ").X);
+                ImGui.PushID($"{key}_toggle");
+                if (ImGui.Checkbox("", ref enabled)) { if (enabled) disabledKeys.Remove(key); else disabledKeys.Add(key); }
+                ImGui.PopID();
+            }
             if (enabled) { foreach (var line in lines) { ImGui.Text(line); } }
         }
         messages.Clear();

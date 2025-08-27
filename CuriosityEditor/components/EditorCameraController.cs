@@ -14,7 +14,8 @@ public class EditorCameraController : MonoBehaviour
     private float yaw;
     private float pitch;
 
-    private readonly float lookRate = 10f;
+    private readonly float pivotRate = 10f;
+    private readonly float panRate = 1f;
     private readonly float zoomRate = 0.5f;
     private readonly float zoomMin = 1f;
 
@@ -25,23 +26,28 @@ public class EditorCameraController : MonoBehaviour
     }
 
     public void Update() {
+        float deltaTime = Mathf.Min(Time.unscaledDeltaTime, 1f);
+
         if (Inputs.Pivot.Down) {
-            var lookDelta = Inputs.Pivot.Value * lookRate * Time.unscaledDeltaTime;
+            var pivotDelta = Inputs.Pivot.Value * pivotRate * deltaTime;
 
             /*if (OWInput.IsPressed(InputLibrary.rollMode)) transform.Rotate(Vector3.forward, -lookDelta.x);
             else transform.Rotate(Vector3.up, lookDelta.x);
             transform.Rotate(Vector3.right, -lookDelta.y);*/
             
-            pitch -= lookDelta.y;
+            pitch -= pivotDelta.y;
             pitch = Mathf.Repeat(pitch, 360f);
 
             bool isUpsideDown = pitch > 90f && pitch < 270f;
-            if (isUpsideDown) yaw -= lookDelta.x; else yaw += lookDelta.x;
+            if (isUpsideDown) yaw -= pivotDelta.x; else yaw += pivotDelta.x;
             yaw = Mathf.Repeat(yaw, 360f);
         }
 
         if (Inputs.Pan.Down) {
+            var panDelta = Inputs.Pan.Value * panRate * deltaTime;
 
+            var localPan = new Vector3(panDelta.x, panDelta.y, 0f);
+            _offset += Quaternion.LookRotation(transform.forward, transform.up) * localPan;
         }
 
         if (Inputs.Zoom.Down) {
@@ -51,9 +57,10 @@ public class EditorCameraController : MonoBehaviour
             distance = Mathf.Max(distance, zoomMin);
         }
 
-        Console.Instant.Debug(this, $"Yaw:   {yaw}");
+        /*Console.Instant.Debug(this, $"Yaw:   {yaw}");
         Console.Instant.Debug(this, $"Pitch: {pitch}");
         Console.Instant.Debug(this, $"Dist.: {distance}");
+        Console.Instant.Debug(this, $"Offs.: {Offset}");*/
 
         RecalculateTransform();
     }
