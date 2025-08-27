@@ -1,41 +1,54 @@
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CuriosityEditor.Components;
 
 public class EditorCameraController : MonoBehaviour
 {
-    //public void Start() => ParentToPlayer(true);
+    private Transform _target;
+    public Transform Target { get => _target ?? transform.parent; set { _target = value; RecalculateTransform(); } }
+
+    private float distance = 1f;
+    private float yaw;
+    private float pitch;
+
+    public void Start() {
+        pitch = transform.eulerAngles.x;
+        yaw = transform.eulerAngles.y;
+        TargetPlayer();
+    }
 
     public void Update() {
-        var lookRate = 10f;
-        var lookDelta = InputManager.Inputs.Turn.Value * lookRate * Time.unscaledDeltaTime;
-
         if (InputManager.Inputs.PivotCamera.Down) {
+            var lookRate = 10f;
+            var lookDelta = InputManager.Inputs.Turn.Value * lookRate * Time.unscaledDeltaTime;
 
+            /*if (OWInput.IsPressed(InputLibrary.rollMode)) transform.Rotate(Vector3.forward, -lookDelta.x);
+            else transform.Rotate(Vector3.up, lookDelta.x);
+            transform.Rotate(Vector3.right, -lookDelta.y);*/
+
+            yaw += lookDelta.x;
+            pitch -= lookDelta.y;
+            
+            Console.Debug(this, $"Zoom | Value: {InputManager.Inputs.Zoom.Value}, Down: {InputManager.Inputs.Zoom.Down}");
         }
 
-        if (OWInput.IsPressed(InputLibrary.rollMode)) transform.Rotate(Vector3.forward, -lookDelta.x);
-        else transform.Rotate(Vector3.up, lookDelta.x);
-        transform.Rotate(Vector3.right, -lookDelta.y);
+        if (InputManager.Inputs.Zoom.Down) {
+            var zoomRate = 0.5f;
+            var zoomDelta = InputManager.Inputs.Zoom.Value * zoomRate;
+
+            distance *= 1 + zoomDelta;
+
+            Console.Info(this, $"Zoomed to distance of {distance}.");
+        }
+
+        RecalculateTransform();
     }
 
-    public void ParentToPlayer(bool warp = false) {
-        var playerCameraTransform = Locator.GetPlayerCamera().transform;
-        transform.parent = playerCameraTransform;
-        if (warp) {
-            transform.position = playerCameraTransform.position;
-            transform.rotation = playerCameraTransform.rotation;
-        }
+    private void RecalculateTransform() {
+        transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+        transform.position = Target.position - transform.forward * distance;
     }
 
-    public void ParentToAstroObject(AstroObject astroObject, bool warp = false) {
-        var astroObjectTransform = astroObject.gameObject.transform;
-        transform.parent = astroObjectTransform;
-        if (warp) {
-            transform.position = astroObjectTransform.position;
-        }
-    }
+    public void TargetPlayer() { Target = Locator.GetPlayerCamera().transform; }
+    public void TargetAstroObject(AstroObject astroObject) { Target = astroObject.gameObject.transform; }
 }

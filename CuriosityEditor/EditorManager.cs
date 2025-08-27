@@ -1,5 +1,7 @@
 using System;
 using CuriosityEditor.Components;
+using CuriosityEditor.Interface;
+using ImGuiNET;
 using UnityEngine;
 using UnityEngine.PostProcessing;
 using UnityEngine.SceneManagement;
@@ -13,10 +15,7 @@ public class EditorManager : MonoBehaviour {
 	public static bool InEditor {
 		get => Instance._inEditorMode;
 		set {
-			if (value != Instance._inEditorMode) {
-                if (value) OnEnterEditor?.Invoke();
-                else OnExitEditor?.Invoke();
-            }
+			if (value != Instance._inEditorMode) { if (value) OnEnterEditor?.Invoke(); else OnExitEditor?.Invoke(); }
 			Instance._inEditorMode = value;
 		}
 	}
@@ -24,23 +23,28 @@ public class EditorManager : MonoBehaviour {
     public static event Action OnEnterEditor;
 	public static event Action OnExitEditor;
     
-	private PauseMenuManager _pauseMenuManager;
-    
+    // Editor camera
 	public static OWCamera EditorCamera { get; private set; }
 	private bool _inEditorCamera = false;
-
 	private InputMode _returnInputMode;
     
+	private PauseMenuManager _pauseMenuManager;
+
+    // Interface components
+    private readonly ConsoleWindow consoleWindow = new();
+    private readonly RandomDebugWindow randomDebugWindow = new();
+    
     public void Start() {
-        if (Instance is not null) throw new Exception("Attempted to initialise more than one EditorManager");
+        if (Instance is not null) throw new Exception($"Attempted to initialise more than one {GetType().Name}");
         Instance = this;
-		Main.Console.Info("Initialised Editor Manager.");
         
 		OnEnterEditor += EnterEditor;
 		OnExitEditor += ExitEditor;
         SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.sceneUnloaded += OnSceneUnloaded;
 		GlobalMessenger<OWCamera>.AddListener("SwitchActiveCamera", OnSwitchActiveCamera);
+        
+        Main.ImGuiAPI.Layout += Layout;
 
         SceneInit();
     }
@@ -52,6 +56,8 @@ public class EditorManager : MonoBehaviour {
 		OnExitEditor -= ExitEditor;
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
+        
+        Main.ImGuiAPI.Layout -= Layout;
 	}
 
     public void Update() {
@@ -71,7 +77,6 @@ public class EditorManager : MonoBehaviour {
         // Create editor camera
         (EditorCamera, _) = Main.CommonCameraAPI.CreateCustomCamera("CuriosityEditorCamera", (owCamera) => {
 			if (owCamera?._postProcessing?.profile?.eyeMask is EyeMaskModel eyeMask) eyeMask.enabled = false;
-            owCamera.renderSkybox = false;
 			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("UI"));
 			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("HeadsUpDisplay"));
 			owCamera.mainCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("HelmetUVPass"));
@@ -79,6 +84,7 @@ public class EditorManager : MonoBehaviour {
         
 		EditorCamera.gameObject.AddComponent<EditorCameraController>();
 		EditorCamera.gameObject.SetActive(true);
+        EditorCamera.enabled = false;
         _inEditorCamera = false;
 
         if (InEditor) EnterEditor();
@@ -104,5 +110,34 @@ public class EditorManager : MonoBehaviour {
 
 		OWTime.Unpause(OWTime.PauseType.Menu);
 		EditorCamera.enabled = false;
+    }
+
+    private void Layout() {
+        if (!InEditor) return;
+        ImGui.DockSpaceOverViewport(ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
+
+        if (ImGui.BeginMainMenuBar()) {
+            if (ImGui.BeginMenu("File")) {
+                if (ImGui.MenuItem("New")) {
+                    Console.Info("New pressed");
+                }
+                if (ImGui.MenuItem("Open", "Ctrl+O")) {
+                    Console.Warning("Open pressed");
+                }
+                if (ImGui.MenuItem("Save", "Ctrl+S")) {
+                    Console.Error("Save pressed");
+                }
+                ImGui.EndMenu();
+            }
+            if (ImGui.BeginMenu("Windows")) {
+                consoleWindow.ToggleMenuItem();
+                randomDebugWindow.ToggleMenuItem();
+                ImGui.EndMenu();
+            }
+            ImGui.EndMainMenuBar();
+        }
+
+        consoleWindow.Draw();
+        randomDebugWindow.Draw();
     }
 }

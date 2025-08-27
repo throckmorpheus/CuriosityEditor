@@ -16,7 +16,6 @@ namespace CuriosityEditor;
 public class Main : ModBehaviour
 {
 	public static Main Instance;
-	public static IModConsole Console => Instance?.ModHelper?.Console;
 
 	public static ICommonCameraAPI CommonCameraAPI { get; private set; }
 	public static IImGuiAPI ImGuiAPI { get; private set; }

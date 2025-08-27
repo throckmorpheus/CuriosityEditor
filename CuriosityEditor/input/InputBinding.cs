@@ -41,6 +41,7 @@ public class InputBinding {
     public float SingleAxisValue => SingleAxes.Select(axis => axis switch {
         MouseAxis.Horizontal => Mouse.current.delta.right.ReadValue(),
         MouseAxis.Vertical => Mouse.current.delta.up.ReadValue(),
+        MouseAxis.Wheel => Mouse.current.scroll.ReadValue().normalized.y,
         _ => 0f
     }).OrderBy(x => x).FirstOrDefault();
 
@@ -48,6 +49,7 @@ public class InputBinding {
         MouseAxis.Both => Mouse.current.delta.ReadValue(),
         MouseAxis.Horizontal => new(Mouse.current.delta.right.ReadValue(), 0f),
         MouseAxis.Vertical => new(0f, Mouse.current.delta.up.ReadValue()),
+        MouseAxis.Wheel => Mouse.current.scroll.ReadValue().normalized,
         _ => new()
     }).OrderBy(x => x.magnitude).FirstOrDefault();
 }

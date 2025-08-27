@@ -20,9 +20,8 @@ public class InputManager : MonoBehaviour
     private static InputManager Instance;
 
     public void Start() {
-        if (Instance is not null) throw new Exception("Attempted to initialise more than one InputManager");
+        if (Instance is not null) throw new Exception($"Attempted to initialise more than one {GetType().Name}");
         Instance = this;
-		Main.Console.Info("Initialised Input Manager.");
 
         foreach (var member in typeof(Inputs).GetFields()) {
             var binding = new InputBinding();
@@ -43,7 +42,7 @@ public class InputManager : MonoBehaviour
         _bindings[Inputs.Pan].DoubleAxes.Add(MouseAxis.Both);
         _bindings[Inputs.Turn].DoubleAxes.Add(MouseAxis.Both);
         _bindings[Inputs.Zoom].SingleAxes.Add(MouseAxis.Wheel);
-        Main.Console.Info("Loaded default input config.");
+        Console.Info("Loaded default input config.");
     }
 
     public bool LoadInputConfig() {
@@ -57,7 +56,7 @@ public class InputManager : MonoBehaviour
             }
         }
 
-        Main.Console.Info("Loaded input config.");
+        Console.Info(this, "Loaded input config.");
         return true;
     }
 
@@ -67,6 +66,6 @@ public class InputManager : MonoBehaviour
             inputConfig.Add(member.Name, _bindings[(LogicalInput)member.GetValue(null)]);
         }
         Main.Instance.ModHelper.Storage.Save(inputConfig, "input_config.json");
-        Main.Console.Info("Saved input config.");
+        Console.Info(this, "Saved input config.");
     }
 }
