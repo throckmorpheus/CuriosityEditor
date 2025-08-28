@@ -34,6 +34,7 @@ public class EditorManager : MonoBehaviour {
     // Interface components
     private readonly ConsoleWindow consoleWindow = new();
     private readonly InstantDebugWindow instantDebugWindow = new();
+    private readonly ModWindow modWindow = new();
     
     public void Start() {
         if (Instance is not null) throw new Exception($"Attempted to initialise more than one {GetType().Name}");
@@ -156,6 +157,7 @@ public class EditorManager : MonoBehaviour {
             }
             if (ImGui.BeginMenu("Windows")) {
                 consoleWindow.ToggleMenuItem();
+                modWindow.ToggleMenuItem();
                 ImGui.EndMenu();
             }
             ImGui.EndMainMenuBar();
@@ -163,5 +165,6 @@ public class EditorManager : MonoBehaviour {
 
         instantDebugWindow.Draw();
         consoleWindow.Draw();
+        modWindow.Draw();
     }
 }

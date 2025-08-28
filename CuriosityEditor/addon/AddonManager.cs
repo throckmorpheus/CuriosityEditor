@@ -1,7 +1,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace CuriosityEditor;
@@ -10,6 +12,7 @@ public class AddonManager : MonoBehaviour {
     private static AddonManager Instance;
 
     private readonly HashSet<AddonConfig> addons = [];
+    public static ReadOnlyCollection<AddonConfig> Addons => Instance.addons.ToList().AsReadOnly();
     
     public void Start() {
         if (Instance is not null) throw new Exception($"Attempted to initialise more than one {GetType().Name}");
