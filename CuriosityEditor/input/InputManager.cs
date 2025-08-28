@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using ImGuiNET;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
@@ -27,22 +28,24 @@ public class InputManager : MonoBehaviour
             var logicalInput = (LogicalInput)Activator.CreateInstance(member.FieldType);
             logicalInput._binding = binding;
             member.SetValue(null, logicalInput);
-            _bindings.Add(logicalInput, binding);
         }
 
         if (!LoadInputConfig()) SetupDefaultInputConfig();
     }
 
-    private readonly Dictionary<LogicalInput, InputBinding> _bindings = [];
+    public InputBinding GetBinding(LogicalInput input) => input._binding;
+    public void SetBinding(LogicalInput input, InputBinding binding) => input._binding = binding;
 
     public void SetupDefaultInputConfig() {
-        _bindings[Inputs.ToggleEditor].Add(Key.Semicolon);
+        Inputs.ToggleEditor._binding = InputBinding.From(Key.Semicolon).DeferToImGui(false);
         
         // Camera controls
-        _bindings[Inputs.Zoom].Add(SingleAxis.WheelVertical);
-        _bindings[Inputs.Pivot].With(DoubleAxis.Mouse).When(MouseButton.Middle).WhenNot(Key.LeftShift, Key.RightShift);
-        _bindings[Inputs.Pan].With(DoubleAxis.Mouse).When(MouseButton.Middle).When(Key.LeftShift, Key.RightShift);
-        Console.Info("Loaded default input config.");
+        Inputs.Zoom._binding         = InputBinding.From(SingleAxis.WheelVertical);
+
+        var shiftBinding             = InputBinding.From(Key.LeftShift, Key.RightShift).DeferToImGui(false);
+        Inputs.Pivot._binding        = InputBinding.From(DoubleAxis.Mouse).When(MouseButton.Middle).WhenNot(shiftBinding);
+        Inputs.Pan._binding          = InputBinding.From(DoubleAxis.Mouse).When(MouseButton.Middle).When(shiftBinding);
+        Console.Info(this, "Loaded default input config.");
     }
 
     public bool LoadInputConfig() {
@@ -51,8 +54,7 @@ public class InputManager : MonoBehaviour
 
         foreach (var member in typeof(Inputs).GetFields(BindingFlags.Static)) {
             if (inputConfig.TryGetValue(member.Name, out var configBinding)) {
-                var binding = _bindings[(LogicalInput)member.GetValue(null)];
-                binding.CopyFrom(configBinding);
+                ((LogicalInput)member.GetValue(null))._binding = configBinding;
             }
         }
 
@@ -63,7 +65,7 @@ public class InputManager : MonoBehaviour
     public void SaveInputConfig() {
         Dictionary<string, InputBinding> inputConfig = [];
         foreach (var member in typeof(Inputs).GetFields(BindingFlags.Static)) {
-            inputConfig.Add(member.Name, _bindings[(LogicalInput)member.GetValue(null)]);
+            inputConfig.Add(member.Name, ((LogicalInput)member.GetValue(null))._binding);
         }
         Main.Instance.ModHelper.Storage.Save(inputConfig, "input_config.json");
         Console.Info(this, "Saved input config.");

@@ -65,6 +65,8 @@ public class EditorManager : MonoBehaviour {
     public void Update() {
         if (Inputs.ToggleEditor.JustPressed && !IsInPauseMenu()) InEditor = !InEditor;
         Console.Instant.Debug($"FPS: {1f/Time.unscaledDeltaTime}");
+        Console.Instant.Debug("ImGui IO", $"WantCaptureKeyboard: {ImGui.GetIO().WantCaptureKeyboard}");
+        Console.Instant.Debug("ImGui IO", $"WantCaptureMouse:    {ImGui.GetIO().WantCaptureMouse}");
     }
 
     private bool IsInPauseMenu() => _pauseMenuManager?.IsOpen() ?? false;
