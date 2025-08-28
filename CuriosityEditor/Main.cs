@@ -10,6 +10,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.PostProcessing;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 namespace CuriosityEditor;
 
@@ -31,7 +32,8 @@ public class Main : ModBehaviour
 		ImGuiAPI = ModHelper.Interaction.TryGetModApi<IImGuiAPI>("Throckmorpheus.ImGuiOW");
 		GizmosAPI = ModHelper.Interaction.TryGetModApi<IGizmosAPI>("Locochoco.GizmosLibrary");
 
-		gameObject.AddComponent<InputManager>();
 		gameObject.AddComponent<EditorManager>();
+		gameObject.AddComponent<InputManager>();
+		gameObject.AddComponent<AddonManager>();
 	}
 }
