@@ -32,8 +32,8 @@ public class InstantDebugWindow : Window {
         foreach (var (key, lines) in messages) {
             bool enabled = !disabledKeys.Contains(key);
             if (key != "") {
-                ImGui.SeparatorText($"{key}  ");
-                ImGui.SameLine(); ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.CalcTextSize("   ").X);
+                ImGui.SeparatorText($"{key}    ");
+                ImGui.SameLine(); ImGui.SetCursorPosX(ImGui.GetCursorPosX() - ImGui.CalcTextSize("    ").X);
                 ImGui.PushID($"{key}_toggle");
                 if (ImGui.Checkbox("", ref enabled)) { if (enabled) disabledKeys.Remove(key); else disabledKeys.Add(key); }
                 ImGui.PopID();
